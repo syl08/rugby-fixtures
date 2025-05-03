@@ -1,23 +1,23 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import NavBar from './components/navBar';
+import NavBar from './components/NavBar';
 
 export const metadata: Metadata = {
-  title: 'Rugby Fixtures App',
-  description: 'Upload and search rugby fixtures',
+    title: 'Rugby Fixtures App',
+    description: 'Upload and search rugby fixtures',
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className="bg-gray-100">
-        <NavBar />
-        <main>{children}</main>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body className="bg-gray-100">
+                <NavBar />
+                <main>{children}</main>
+            </body>
+        </html>
+    );
 }
