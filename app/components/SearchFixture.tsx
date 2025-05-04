@@ -31,7 +31,7 @@ export default function SearchFixture() {
 
                     const fixturesData = await findFixturesByTeam(debouncedQuery);
                     setFixtures(fixturesData);
-                } catch (error: unknown) {
+                } catch (error) {
                     console.error(error);
                 } finally {
                     setIsLoading(false);
@@ -47,7 +47,7 @@ export default function SearchFixture() {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="max-w-md w-full p-6">
             <div className="flex flex-col space-y-4">
                 <div className="w-64">
                     <input
@@ -55,7 +55,7 @@ export default function SearchFixture() {
                         value={query}
                         onChange={handleChange}
                         placeholder="Input team name"
-                        className="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        className="w-full max-w-xs px-4 py-3 bg-gray-100 text-gray-800 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                     />
                 </div>
                 <div style={{ minHeight: '1rem' }}>
