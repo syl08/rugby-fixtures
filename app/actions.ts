@@ -117,3 +117,36 @@ export async function deleteFixtures() {
         throw error;
     }
 }
+
+export async function findFixturesByTeam(team: string) {
+    if (!team) {
+        throw new Error('Team name is required');
+    }
+
+    try {
+        const fixtures = await prisma.fixture.findMany({
+            where: {
+                OR: [
+                    {
+                        home_team: {
+                            contains: team,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        away_team: {
+                            contains: team,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            },
+            orderBy: { fixture_datetime: 'asc' },
+        });
+
+        return fixtures;
+    } catch (error) {
+        console.error('Error find fixtures:', error);
+        throw error;
+    }
+}
