@@ -125,6 +125,7 @@ export async function findFixturesByTeam(team: string) {
 
     try {
         const fixtures = await prisma.fixture.findMany({
+            omit: { id: true },
             where: {
                 OR: [
                     {
