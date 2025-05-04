@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Rugby Fixtures Application
+A web application built with Next.js, Prisma, and MongoDB, hosted on Vercel at https://v0-rugby-fixture-app.vercel.app It allows users to upload, store, and search rugby fixtures from CSV files.
 
-## Getting Started
+Features
 
-First, run the development server:
+Upload Page: Upload CSV files with rugby fixture data, supporting large files (up to 10MB).
+Search Page: Search fixtures by team name. Clicking a fixture to display the details.
+Navigation Bar: Navigation with links to Home, Upload, and Search pages. Delete Fixtures button to delete all fixtures in database.
+Database: Stores fixtures in MongoDB Atlas using Prisma in server component.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Node.js: Version 20 or higher.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set Up Environment Variables:Create a .env file in the root directory with your MongoDB Atlas connection string:
+DATABASE_URL="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Replace <username>, <password>, <cluster> and <dbname> with your MongoDB Atlas credentials.
 
-## Learn More
+Initialize Prisma:Generate the Prisma client:
+npx prisma generate
 
-To learn more about Next.js, take a look at the following resources:
+Ensure the Prisma schema (prisma/schema.prisma) defines the Fixture model:
+model Fixture {
+id String @id @default(auto()) @map("\_id") @db.ObjectId
+fixture_mid String @unique
+season String
+competition_name String?
+fixture_datetime DateTime
+fixture_round String
+home_team String
+away_team String
+}
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Running the Application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Development Mode:Start the Next.js development server:npm run dev
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open http://localhost:3000 with your browser to see the result.
