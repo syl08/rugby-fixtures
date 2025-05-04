@@ -18,10 +18,15 @@ export default function UploadFixtureForm() {
             if (selectedFile && selectedFile.size > maxSize) {
                 setMessage('File is too large (max 10MB)');
 
+                setTimeout(() => {
+                    setMessage('');
+                }, 5000);
+
                 return;
             }
 
             setFile(selectedFile);
+            setMessage('');
         }
     };
 
@@ -30,34 +35,73 @@ export default function UploadFixtureForm() {
 
         if (!file) {
             setMessage('Please select a file');
+
+            setTimeout(() => {
+                setMessage('');
+            }, 5000);
+
             return;
         }
 
-        try {
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: async (result) => {
-                    try {
-                        setIsLoading(true);
+        const chunkSize = 500;
+        let chunk: unknown[] = [];
 
-                        const res = await createFixturesBulk(
-                            result.data as unknown as CsvFixture[],
-                        );
-                        setMessage(res.message);
+        setIsLoading(true);
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            step: async (row, parser) => {
+                chunk.push(row.data);
+
+                if (chunk.length > chunkSize) {
+                    parser.pause();
+
+                    try {
+                        await createFixturesBulk(chunk as unknown[] as CsvFixture[]);
+                        chunk = [];
                     } catch (error) {
-                        console.error(error);
-                    } finally {
+                        console.error('Error uploading chunk:', error);
+                        setMessage('Error uploading chunk');
+                        setTimeout(() => {
+                            setMessage('');
+                        }, 5000);
                         setIsLoading(false);
+                        parser.abort();
+                        return;
                     }
-                },
-                error: (error) => {
-                    console.error('PapaParse error:', error);
-                },
-            });
-        } catch (error) {
-            console.error('Error reading file:', error);
-        }
+                }
+
+                parser.resume();
+            },
+            complete: async () => {
+                if (chunk.length > 0) {
+                    try {
+                        await createFixturesBulk(chunk as unknown[] as CsvFixture[]);
+                        setMessage('Upload complete!');
+                        setTimeout(() => {
+                            setMessage('');
+                        }, 5000);
+                    } catch (error) {
+                        console.error('Error uploading final chunk:', error);
+                        setMessage('Error uploading final chunk');
+                        setTimeout(() => {
+                            setMessage('');
+                        }, 5000);
+                    }
+                }
+
+                setIsLoading(false);
+            },
+            error: (error) => {
+                console.error('PapaParse error:', error);
+                setMessage('Error parsing file');
+                setTimeout(() => {
+                    setMessage('');
+                }, 5000);
+                setIsLoading(false);
+            },
+        });
     };
 
     return (
@@ -83,7 +127,7 @@ export default function UploadFixtureForm() {
                     <button
                         type="submit"
                         disabled={!file || isLoading}
-                        className="w-full px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+                        className="w-full px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 cursor-pointer transition disabled:bg-blue-300 disabled:cursor-not-allowed transition"
                     >
                         {isLoading ? 'Uploading...' : 'Upload'}
                     </button>
