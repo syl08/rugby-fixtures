@@ -20,16 +20,27 @@ export default function SearchFixture() {
     }, [query]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setQuery(event.target.value);
+        const value = event.target.value;
+        setQuery(value);
+
+        if (value.trim() === '') {
+            setFixtures([]);
+        }
     };
 
     useEffect(() => {
+        const sanitizedQuery = debouncedQuery.trim();
+
+        if (!sanitizedQuery) {
+            return;
+        }
+
         async function findFixtures() {
-            if (debouncedQuery) {
+            if (debouncedQuery.trim()) {
                 try {
                     setIsLoading(true);
 
-                    const fixturesData = await findFixturesByTeam(debouncedQuery);
+                    const fixturesData = await findFixturesByTeam(sanitizedQuery);
                     setFixtures(fixturesData);
                 } catch (error) {
                     console.error(error);
